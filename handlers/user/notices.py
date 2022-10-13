@@ -113,10 +113,14 @@ async def run_send_notice():
                                     s = f'Уведомление. Найдено: {count_new_ads} объявлений' #, время сбора: {round(time.time() - st_time, 2)} секунд'
                                     name_to_send = f'{name_to_send}.xlsx'
                                     create_message(user['cid'], f'{s};{name_to_send}')
-                                    # await bot.send_message(user['cid'], s)
-                                    # await bot.send_document(user['cid'], open(f'{name_to_send}.xlsx', 'rb'))
-                                    os.remove(f'{name_to_send}.xlsx')
+                                    # print(1)
+                                    # asyncio.create_task(bot.send_message(user['cid'], s))
+                                    # print(2)
+                                    # asyncio.create_task(bot.send_document(user['cid'], open(f'{name_to_send}', 'rb')))
+                                    # print(3)
+                                    #os.remove(f'{name_to_send}')
                             except Exception as e:
+                                print(e)
                                 df = pd.DataFrame({'Link': [i['link'] for i in full_ads],
                                                    'Name': [i['name'] for i in full_ads],
                                                    'Price': [i['price'] for i in full_ads],
@@ -129,8 +133,11 @@ async def run_send_notice():
                                 s = f'Уведомление. Найдено: {len(full_ads)} объявлений, время сбора: {round(time.time() - st_time, 2)} секунд'
                                 name1 = f'{name1}.xlsx'
                                 create_message(user['cid'], f'{s};{name1}')
-                                # await bot.send_message(user['cid'], f'Уведомление. Найдено: {full_ads} объявлений, время сбора: {round(time.time() - st_time, 2)} секунд')
-                                # await bot.send_document(user['cid'], open(f'{name1}.xlsx', 'rb'))
+                                # print(4)
+                                # asyncio.create_task(bot.send_message(user['cid'], f'Уведомление. Найдено: {full_ads} объявлений'))
+                                # print(5)
+                                # asyncio.create_task(bot.send_document(user['cid'], open(f'{name1}', 'rb')))
+                                # print(6)
                         else:
                             print('no ads')
                 clear_buffer()
@@ -138,20 +145,21 @@ async def run_send_notice():
             t_sleep = round(time.time() - st_time)
             if t_sleep <= 0:
                 t_sleep = 0
-            await send_messages()
-            await asyncio.sleep(t_sleep)
+            #await send_messages()
+            await asyncio.sleep(60 - t_sleep)
         except Exception as e:
             print(e)
 
 
 async def send_messages():
-    try:
-        print('start send messages')
-        r = get_messages()
-        for i in r:
-            await bot.send_message(i['cid'], i['message'].split(';')[0])
-            await bot.send_document(i['cid'], open(i['message'].split(';')[1], 'rb'))
-            delete_message(i['cid'], i['message'])
-        await asyncio.sleep(60)
-    except Exception as e:
-        print(e)
+    while True:
+        try:
+            print('start send messages')
+            r = get_messages()
+            for i in r:
+                await bot.send_message(i['cid'], i['message'].split(';')[0])
+                await bot.send_document(i['cid'], open(i['message'].split(';')[1], 'rb'))
+                delete_message(i['cid'], i['message'])
+            await asyncio.sleep(60)
+        except Exception as e:
+            print(e)
