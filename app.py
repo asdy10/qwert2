@@ -4,7 +4,7 @@ import threading
 
 from aiogram.dispatcher import FSMContext
 
-from handlers.user.notices import run_send_notice, LoopStart, send_message
+from handlers.user.notices import run_send_notice, LoopStart
 from aiogram import executor, types
 from aiogram.types import ReplyKeyboardMarkup
 from data import config
@@ -51,8 +51,6 @@ async def on_startup(dp):
     logging.info('#####START#####')
     await bot.delete_webhook()
     await bot.set_webhook(config.WEBHOOK_URL)
-    asyncio.create_task(send_message())
-
     th = threading.Thread(target=LoopStart)
     th.start()
 

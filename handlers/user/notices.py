@@ -58,9 +58,6 @@ def LoopStart():
 
 async def run_send_notice():
     await asyncio.sleep(0)
-    #print(get_full_table())
-    length = 0
-    print(length)
     while True:
         try:
             st_time = time.time()
@@ -141,21 +138,20 @@ async def run_send_notice():
             t_sleep = round(time.time() - st_time)
             if t_sleep <= 0:
                 t_sleep = 0
+            await send_messages()
             await asyncio.sleep(t_sleep)
         except Exception as e:
             print(e)
 
 
-async def send_message():
-    while True:
-        try:
-            print('start send messages')
-            r = get_messages()
-            for i in r:
-                print(i)
-                await bot.send_message(i['cid'], i['message'].split(';')[0])
-                await bot.send_document(i['cid'], open(i['message'].split(';')[1], 'rb'))
-                delete_message(i['cid'], i['message'])
-            await asyncio.sleep(100)
-        except Exception as e:
-            print(e)
+async def send_messages():
+    try:
+        print('start send messages')
+        r = get_messages()
+        for i in r:
+            await bot.send_message(i['cid'], i['message'].split(';')[0])
+            await bot.send_document(i['cid'], open(i['message'].split(';')[1], 'rb'))
+            delete_message(i['cid'], i['message'])
+        await asyncio.sleep(60)
+    except Exception as e:
+        print(e)
