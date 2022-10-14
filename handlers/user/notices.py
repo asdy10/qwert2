@@ -87,10 +87,15 @@ async def run_send_notice():
                                         new_arr.append(i)
                                         def_arr.append(
                                             [i['link'], i['name'], i['price'], i['views'], i['seller'], i['phone'],
-                                             i['active_count'],
-                                             i['sold_count'], i['reviews'], i['phone']])
+                                             i['active_count'], i['sold_count'], i['reviews'], i['phone']]) #
                                         count_new_ads += 1
+                                #print(1)
+
                                 if count_new_ads > 0:
+                                    for i in def_arr:
+                                        if len(i) < 10:
+                                            i += [0, '0']
+                                    #print(def_arr[1])
                                     df = pd.DataFrame({'Link': [i[0] for i in def_arr],
                                                        'Name': [i[1] for i in def_arr],
                                                        'Price': [i[2] for i in def_arr],
@@ -101,6 +106,7 @@ async def run_send_notice():
                                                        'Sold count': [i[7] for i in def_arr],
                                                        'Reviews': [i[8] for i in def_arr],
                                                        'Phone': [i[9] for i in def_arr],})
+                                    #print(2)
                                     df2 = pd.DataFrame({'Link': [i['link'] for i in new_arr],
                                                         'Name': [i['name'] for i in new_arr],
                                                         'Price': [i['price'] for i in new_arr],
@@ -112,6 +118,7 @@ async def run_send_notice():
                                                         'Reviews': [i['reviews'] for i in new_arr],
                                                         'Phone': [i['phone'] for i in new_arr]
                                                         })
+                                    #print(3)
                                     df.to_excel(f'{name1}.xlsx', sheet_name='Result', index=False)
                                     name_to_send = f'{name1}{round(time.time())}'
                                     df2.to_excel(f'{name_to_send}.xlsx', sheet_name='Result', index=False)

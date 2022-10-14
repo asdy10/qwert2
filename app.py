@@ -22,7 +22,7 @@ import logging
 filters.setup(dp)
 
 WEBAPP_HOST = "127.0.0.1"
-WEBAPP_PORT = int(os.environ.get("PORT", 5005))
+WEBAPP_PORT = int(os.environ.get("PORT", 5000))
 
 
 @dp.message_handler(IsUser(), commands='start', state='*')

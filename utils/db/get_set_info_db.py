@@ -62,7 +62,7 @@ def create_template(params):
                           'published': int(params['published']), 'close_ad_min': int(params['close_ad_min']),
                           'close_ad_max': int(params['close_ad_max']), 'active_ad_min': int(params['active_ad_min']),
                           'active_ad_max': int(params['active_ad_max']), 'views_min': int(params['views_min']),
-                          'views_max': int(params['views_max']), 'reviews': int(params['reviews'])})
+                          'views_max': int(params['views_max'])})
 
 
 def get_templates_cid(cid):
@@ -161,6 +161,7 @@ def get_from_buffer():
     col = db.collection('buffer')
     result = db.find_records(col, {})
     # db.delete_records(col, {})
+
     return [i for i in result]
 
 
@@ -170,6 +171,7 @@ def clear_buffer():
 
 
 '''Telegram Bot End'''
+
 
 
 

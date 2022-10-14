@@ -275,96 +275,97 @@ async def process_all_cat0(query: CallbackQuery, callback_data: dict, state: FSM
     # for i in arr:
     #     new_arr_links.append(i[1][[j for j in i[1].keys()][0]])
     user = get_user(query.from_user.id)
-    if str(user['sub']) == '1':
-        await query.message.answer('Данные собираются, ожидайте...')
-        st_time = time.time()
-        async with state.proxy() as data:
-            params = {}
-            params['max_price'] = data['max_price']
-            params['min_price'] = data['min_price']
-            params['published'] = data['published']
-            params['active_ad_min'] = data['active_ad_min']
-            params['active_ad_max'] = data['active_ad_max']
-            params['close_ad_min'] = data['close_ad_min']
-            params['close_ad_max'] = data['close_ad_max']
-            params['views_min'] = data['views_min']
-            params['views_max'] = data['views_max']
-            m = f"цена |{params['min_price']}:{params['max_price']}|\n" \
-                f"публикация |{params['published']}|\n" \
-                f"активных |{params['active_ad_min']}:{params['active_ad_max']}|\n" \
-                f"завершенных |{params['close_ad_min']}:{params['close_ad_max']}|\n" \
-                f"просмотров |{params['views_min']}:{params['views_max']}|"
-        full_ads = []
-        # params['category'] = new_arr_links
-        name1 = f'full'
-        try:
-            res = pd.read_excel(f'{name1}.xlsx', sheet_name='Result')
-            def_arr = res.values.tolist()
-        except:
-            def_arr = []
-        print('start1')
-
-        ads = await get_and_filter_all(params, new_arr_links, def_arr)
-        full_ads += ads
-        if len(ads) > 0:
-
+    if user:
+        if str(user['sub']) == '1':
+            await query.message.answer('Данные собираются, ожидайте...')
+            st_time = time.time()
+            async with state.proxy() as data:
+                params = {}
+                params['max_price'] = data['max_price']
+                params['min_price'] = data['min_price']
+                params['published'] = data['published']
+                params['active_ad_min'] = data['active_ad_min']
+                params['active_ad_max'] = data['active_ad_max']
+                params['close_ad_min'] = data['close_ad_min']
+                params['close_ad_max'] = data['close_ad_max']
+                params['views_min'] = data['views_min']
+                params['views_max'] = data['views_max']
+                m = f"цена |{params['min_price']}:{params['max_price']}|\n" \
+                    f"публикация |{params['published']}|\n" \
+                    f"активных |{params['active_ad_min']}:{params['active_ad_max']}|\n" \
+                    f"завершенных |{params['close_ad_min']}:{params['close_ad_max']}|\n" \
+                    f"просмотров |{params['views_min']}:{params['views_max']}|"
+            full_ads = []
+            # params['category'] = new_arr_links
+            name1 = f'full'
             try:
                 res = pd.read_excel(f'{name1}.xlsx', sheet_name='Result')
                 def_arr = res.values.tolist()
-                new_arr = []
-                count_new_ads = 0
-                for i in full_ads:
-                    if i['seller'] not in str(def_arr):
-                        new_arr.append(i)
-                        def_arr.append(
-                            [i['link'], i['name'], i['price'], i['views'], i['seller'], i['phone'], i['active_count'],
-                             i['sold_count']])
-                        count_new_ads += 1
-                if count_new_ads > 0:
-                    df = pd.DataFrame({'Link': [i[0] for i in def_arr],
-                                       'Name': [i[1] for i in def_arr],
-                                       'Price': [i[2] for i in def_arr],
-                                       'Views': [i[3] for i in def_arr],
-                                       'Seller': [i[4] for i in def_arr],
-                                       'Phone': [i[5] for i in def_arr],
-                                       'Active count': [i[6] for i in def_arr],
-                                       'Sold count': [i[7] for i in def_arr]})
-                    df2 = pd.DataFrame({'Link': [i['link'] for i in new_arr],
-                                        'Name': [i['name'] for i in new_arr],
-                                        'Price': [i['price'] for i in new_arr],
-                                        'Views': [i['views'] for i in new_arr],
-                                        'Seller': [i['seller'] for i in new_arr],
-                                        'Phone': [i['phone'] for i in new_arr],
-                                        'Active count': [i['active_count'] for i in new_arr],
-                                        'Sold count': [i['sold_count'] for i in new_arr]})
-                    df.to_excel(f'{name1}.xlsx', sheet_name='Result', index=False)
-                    name_to_send = f'{name1}{round(time.time())}'
-                    df2.to_excel(f'{name_to_send}.xlsx', sheet_name='Result', index=False)
-                    await query.message.answer(
-                        f'Готово. Найдено: {count_new_ads} объявлений, время сбора: {round(time.time() - st_time, 2)} секунд\n{m}')
-                    await query.message.answer_document(open(f'{name_to_send}.xlsx', 'rb'))
-                    os.remove(f'{name_to_send}.xlsx')
-                else:
-                    await query.message.answer('Новых объявлений с такими параметрами не найдено')
             except:
-                df = pd.DataFrame({'Link': [i['link'] for i in full_ads],
-                                   'Name': [i['name'] for i in full_ads],
-                                   'Price': [i['price'] for i in full_ads],
-                                   'Views': [i['views'] for i in full_ads],
-                                   'Seller': [i['seller'] for i in full_ads],
-                                   'Phone': [i['phone'] for i in full_ads],
-                                   'Active count': [i['active_count'] for i in full_ads],
-                                   'Sold count': [i['sold_count'] for i in full_ads]})
-                df.to_excel(f'{name1}.xlsx', sheet_name='Result', index=False)
-                await query.message.answer(f'Готово. Найдено: {len(full_ads)} объявлений, время сбора: {round(time.time() - st_time, 2)} секунд\n{m}')
-                await query.message.answer_document(open(f'{name1}.xlsx', 'rb'))
+                def_arr = []
+            print('start1')
+
+            ads = await get_and_filter_all(params, new_arr_links, def_arr)
+            full_ads += ads
+            if len(ads) > 0:
+
+                try:
+                    res = pd.read_excel(f'{name1}.xlsx', sheet_name='Result')
+                    def_arr = res.values.tolist()
+                    new_arr = []
+                    count_new_ads = 0
+                    for i in full_ads:
+                        if i['seller'] not in str(def_arr):
+                            new_arr.append(i)
+                            def_arr.append(
+                                [i['link'], i['name'], i['price'], i['views'], i['seller'], i['phone'], i['active_count'],
+                                 i['sold_count']])
+                            count_new_ads += 1
+                    if count_new_ads > 0:
+                        df = pd.DataFrame({'Link': [i[0] for i in def_arr],
+                                           'Name': [i[1] for i in def_arr],
+                                           'Price': [i[2] for i in def_arr],
+                                           'Views': [i[3] for i in def_arr],
+                                           'Seller': [i[4] for i in def_arr],
+                                           'Phone': [i[5] for i in def_arr],
+                                           'Active count': [i[6] for i in def_arr],
+                                           'Sold count': [i[7] for i in def_arr]})
+                        df2 = pd.DataFrame({'Link': [i['link'] for i in new_arr],
+                                            'Name': [i['name'] for i in new_arr],
+                                            'Price': [i['price'] for i in new_arr],
+                                            'Views': [i['views'] for i in new_arr],
+                                            'Seller': [i['seller'] for i in new_arr],
+                                            'Phone': [i['phone'] for i in new_arr],
+                                            'Active count': [i['active_count'] for i in new_arr],
+                                            'Sold count': [i['sold_count'] for i in new_arr]})
+                        df.to_excel(f'{name1}.xlsx', sheet_name='Result', index=False)
+                        name_to_send = f'{name1}{round(time.time())}'
+                        df2.to_excel(f'{name_to_send}.xlsx', sheet_name='Result', index=False)
+                        await query.message.answer(
+                            f'Готово. Найдено: {count_new_ads} объявлений, время сбора: {round(time.time() - st_time, 2)} секунд\n{m}')
+                        await query.message.answer_document(open(f'{name_to_send}.xlsx', 'rb'))
+                        os.remove(f'{name_to_send}.xlsx')
+                    else:
+                        await query.message.answer('Новых объявлений с такими параметрами не найдено')
+                except:
+                    df = pd.DataFrame({'Link': [i['link'] for i in full_ads],
+                                       'Name': [i['name'] for i in full_ads],
+                                       'Price': [i['price'] for i in full_ads],
+                                       'Views': [i['views'] for i in full_ads],
+                                       'Seller': [i['seller'] for i in full_ads],
+                                       'Phone': [i['phone'] for i in full_ads],
+                                       'Active count': [i['active_count'] for i in full_ads],
+                                       'Sold count': [i['sold_count'] for i in full_ads]})
+                    df.to_excel(f'{name1}.xlsx', sheet_name='Result', index=False)
+                    await query.message.answer(f'Готово. Найдено: {len(full_ads)} объявлений, время сбора: {round(time.time() - st_time, 2)} секунд\n{m}')
+                    await query.message.answer_document(open(f'{name1}.xlsx', 'rb'))
+            else:
+                await query.message.answer('Объявлений с такими параметрами не найдено')
+            col = db.collection('orders')
+            db.insert_one_record(col, {'cid': query.from_user.id, 'category': 'full',
+                                       'date': datetime.today().strftime("%d.%m.%Y %H:%M:%S")})
         else:
-            await query.message.answer('Объявлений с такими параметрами не найдено')
-        col = db.collection('orders')
-        db.insert_one_record(col, {'cid': query.from_user.id, 'category': 'full',
-                                   'date': datetime.today().strftime("%d.%m.%Y %H:%M:%S")})
-    else:
-        await query.message.answer('Нет доступа.')
+            await query.message.answer('Нет доступа.')
 
 
 @dp.callback_query_handler(IsUser(), cat_cb.filter(action='add_cat1'))

@@ -67,3 +67,4 @@ class MongoHandler(object):
         self.collection('templates')
         self.collection('orders')
         self.collection('buffer')
+        self.collection('buffer')
