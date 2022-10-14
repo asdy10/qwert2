@@ -2,7 +2,7 @@ import asyncio
 import time
 from itertools import groupby
 
-from utils.db.get_set_info_db import get_table
+from utils.db.get_set_info_db import get_table, get_from_buffer
 from utils.youla_api.get_info import delete_ads_by_owner_async, get_phones_async
 
 
@@ -28,7 +28,7 @@ async def get_and_filter(params):
 
 async def get_and_filter_all(params, new_arr_links, def_arr):
     st_full_time = time.time()
-    ads = []
+    ads = [] # get_from_buffer()
     print('start get info from db')
     for i in new_arr_links:
         params['category'] = i

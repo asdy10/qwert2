@@ -99,7 +99,7 @@ def get_table(params):
     category = params['category']
     max_price = params['max_price']
     min_price = params['min_price']
-    published = params['published'] * 60
+    published = params['published'] * 60 + 60
     close_ad_min = params['close_ad_min']
     close_ad_max = params['close_ad_max']
     views_min = params['views_min']

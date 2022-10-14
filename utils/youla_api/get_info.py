@@ -20,13 +20,13 @@ async def delete_ads_by_owner_async(ads, params):
         try:
             if params['active_ad_min'] <= owner_param['prods_active_cnt'] <= params['active_ad_max']\
                     and params['close_ad_min'] <= owner_param['prods_sold_cnt'] <= params['close_ad_max'] \
-                    and params['views_min'] <= owner_param['views'] <= params['views_max']\
-                    and params['reviews'] <= owner_param['reviews']:
+                    and params['views_min'] <= owner_param['views'] <= params['views_max']:
+                   # and params['reviews'] <= owner_param['reviews']:
                 i['active_count'] = owner_param['prods_active_cnt']
                 i['phone'] = owner_param['phone']
                 new_ads_.append(i)
-        except:
-            pass
+        except Exception as e:
+            print(e)
     return new_ads_
 
 
@@ -62,8 +62,8 @@ async def get_owner_async(session, pid):
             arr['owner_id'] = owner['id']
             arr['views'] = res['views']
             arr['price'] = res['discounted_price']
-            arr['phone'] = res['display_phone_num']
-            arr['reviews'] = res['rating_mark_cnt']
+            arr['phone'] = owner['display_phone_num']
+            arr['reviews'] = owner['rating_mark_cnt']
         except:
             f = False
     if not f:
