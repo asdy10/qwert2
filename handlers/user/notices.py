@@ -88,7 +88,7 @@ async def run_send_notice():
                                         def_arr.append(
                                             [i['link'], i['name'], i['price'], i['views'], i['seller'], i['phone'],
                                              i['active_count'],
-                                             i['sold_count']])
+                                             i['sold_count'], i['reviews'], i['phone']])
                                         count_new_ads += 1
                                 if count_new_ads > 0:
                                     df = pd.DataFrame({'Link': [i[0] for i in def_arr],
@@ -96,17 +96,22 @@ async def run_send_notice():
                                                        'Price': [i[2] for i in def_arr],
                                                        'Views': [i[3] for i in def_arr],
                                                        'Seller': [i[4] for i in def_arr],
-                                                       'Phone': [i[5] for i in def_arr],
+                                                       #'Phone': [i[5] for i in def_arr],
                                                        'Active count': [i[6] for i in def_arr],
-                                                       'Sold count': [i[7] for i in def_arr]})
+                                                       'Sold count': [i[7] for i in def_arr],
+                                                       'Reviews': [i[8] for i in def_arr],
+                                                       'Phone': [i[9] for i in def_arr],})
                                     df2 = pd.DataFrame({'Link': [i['link'] for i in new_arr],
                                                         'Name': [i['name'] for i in new_arr],
                                                         'Price': [i['price'] for i in new_arr],
                                                         'Views': [i['views'] for i in new_arr],
                                                         'Seller': [i['seller'] for i in new_arr],
-                                                        'Phone': [i['phone'] for i in new_arr],
+                                                        #'Phone': [i['phone'] for i in new_arr],
                                                         'Active count': [i['active_count'] for i in new_arr],
-                                                        'Sold count': [i['sold_count'] for i in new_arr]})
+                                                        'Sold count': [i['sold_count'] for i in new_arr],
+                                                        'Reviews': [i['reviews'] for i in new_arr],
+                                                        'Phone': [i['phone'] for i in new_arr]
+                                                        })
                                     df.to_excel(f'{name1}.xlsx', sheet_name='Result', index=False)
                                     name_to_send = f'{name1}{round(time.time())}'
                                     df2.to_excel(f'{name_to_send}.xlsx', sheet_name='Result', index=False)

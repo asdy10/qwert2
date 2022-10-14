@@ -177,6 +177,7 @@ async def process_make_template_confirm(message: Message, state: FSMContext):
             data['tid'] = temps[-1]['tid'] + 1
         else:
             data['tid'] = 1
+        data['reviews'] = 3
         create_template(data)
     await state.finish()
     await message.answer('Сохранено', reply_markup=user_markup())

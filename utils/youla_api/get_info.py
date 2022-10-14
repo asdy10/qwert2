@@ -15,14 +15,15 @@ async def delete_ads_by_owner_async(ads, params):
             tasks.append(task)
         res = await asyncio.gather(*tasks)
     new_ads_ = []
-    for i in res:
-        print(i)
+
     for i, owner_param in zip(ads, res):
         try:
             if params['active_ad_min'] <= owner_param['prods_active_cnt'] <= params['active_ad_max']\
                     and params['close_ad_min'] <= owner_param['prods_sold_cnt'] <= params['close_ad_max'] \
-                    and params['views_min'] <= owner_param['views'] <= params['views_max']:
+                    and params['views_min'] <= owner_param['views'] <= params['views_max']\
+                    and params['reviews'] <= owner_param['reviews']:
                 i['active_count'] = owner_param['prods_active_cnt']
+                i['phone'] = owner_param['phone']
                 new_ads_.append(i)
         except:
             pass
@@ -51,6 +52,7 @@ async def get_owner_async(session, pid):
         try:
             res = res1['data']
             owner = res['owner']
+            #print(owner)
             try:
                 arr['date_created'] = res['date_created']
             except:
@@ -60,6 +62,8 @@ async def get_owner_async(session, pid):
             arr['owner_id'] = owner['id']
             arr['views'] = res['views']
             arr['price'] = res['discounted_price']
+            arr['phone'] = res['display_phone_num']
+            arr['reviews'] = res['rating_mark_cnt']
         except:
             f = False
     if not f:
@@ -69,7 +73,8 @@ async def get_owner_async(session, pid):
         arr['views'] = 1000000
         arr['price'] = 1000000
         arr['date_created'] = 1658000000
-
+        arr['phone'] = '0'
+        arr['reviews'] = 0
     return arr
 
 
