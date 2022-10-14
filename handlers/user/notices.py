@@ -153,12 +153,15 @@ async def run_send_notice():
 
 
 async def send_messages():
+    await asyncio.sleep(10)
     while True:
         try:
             print('start send messages')
             st_time = time.time()
             r = get_messages()
+            rem = []
             for i in r:
+                rem.append(i['message'].split(';')[1])
                 await bot.send_message(i['cid'], i['message'].split(';')[0])
                 await bot.send_document(i['cid'], open(i['message'].split(';')[1], 'rb'))
                 delete_message(i['cid'], i['message'])
@@ -167,5 +170,7 @@ async def send_messages():
                 t_sleep = 0
             print('sleep send message', 60 - t_sleep)
             await asyncio.sleep(60 - t_sleep)
+            for i in rem:
+                os.remove(i)
         except Exception as e:
             print(e)

@@ -23,12 +23,15 @@ async def process_sub_cid(message: Message, state: FSMContext):
         async with state.proxy() as data:
             data['cid'] = message.text
         user = get_user(message.text)
-        if str(user['sub']) == '0':
-            update_user_sub(message.text, '1')
-            await message.answer('Доступ разрешен')
-        else:
-            update_user_sub(message.text, '0')
-            await message.answer('Доступ запрещен')
+        try:
+            if str(user['sub']) == '0':
+                update_user_sub(message.text, '1')
+                await message.answer('Доступ разрешен')
+            else:
+                update_user_sub(message.text, '0')
+                await message.answer('Доступ запрещен')
+        except:
+            await message.answer('Пользователя не найдено')
         await state.finish()
 
     else:

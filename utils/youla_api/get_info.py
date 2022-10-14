@@ -15,7 +15,8 @@ async def delete_ads_by_owner_async(ads, params):
             tasks.append(task)
         res = await asyncio.gather(*tasks)
     new_ads_ = []
-
+    for i in res:
+        print(i)
     for i, owner_param in zip(ads, res):
         try:
             if params['active_ad_min'] <= owner_param['prods_active_cnt'] <= params['active_ad_max']\
