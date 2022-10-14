@@ -72,11 +72,14 @@ async def run_send_notice():
                         temp = get_template_cid_tid(user['cid'], user['notice'])
                         full_ads = []
                         def_arr = []
-                        ads = await get_and_filter_all(temp, ['buffer'], def_arr)
+                        ads = await get_and_filter_all(temp, ['full'], def_arr)
                         full_ads += ads
                         print('len ads filter', len(ads))
                         name1 = 'full'
-                        if len(ads) > 0:
+                        print(ads[1])
+
+
+                        if len(ads) > 20:
                             try:
                                 res = pd.read_excel(f'{name1}.xlsx', sheet_name='Result')
                                 def_arr = res.values.tolist()
@@ -90,8 +93,14 @@ async def run_send_notice():
                                              i['active_count'], i['sold_count'], i['reviews'], i['phone']]) #
                                         count_new_ads += 1
                                 #print(1)
-
-                                if count_new_ads > 0:
+                                for i in get_buffer_cid(user['cid']):
+                                    new_arr.append(i)
+                                    def_arr.append(
+                                        [i['link'], i['name'], i['price'], i['views'], i['seller'], i['phone'],
+                                         i['active_count'], i['sold_count'], i['reviews'], i['phone']])  #
+                                    count_new_ads += 1
+                                print('len new ads', count_new_ads)
+                                if count_new_ads > 20:
                                     for i in def_arr:
                                         if len(i) < 10:
                                             i += [0, '0']
@@ -131,6 +140,13 @@ async def run_send_notice():
                                     # asyncio.create_task(bot.send_document(user['cid'], open(f'{name_to_send}', 'rb')))
                                     # print(3)
                                     #os.remove(f'{name_to_send}')
+                                else:
+                                    print('not enough ads')
+                                    col = db.collection('buffer')
+                                    for ad in ads:
+                                        ad.pop('_id')
+                                        ad['cid'] = user['cid']
+                                    db.insert_many_records(col, ads)
                             except Exception as e:
                                 print(e)
                                 df = pd.DataFrame({'Link': [i['link'] for i in full_ads],
@@ -152,7 +168,8 @@ async def run_send_notice():
                                 # print(6)
                         else:
                             print('no ads')
-                clear_buffer()
+
+               # clear_buffer()
 
             t_sleep = round(time.time() - st_time)
             if t_sleep <= 0:

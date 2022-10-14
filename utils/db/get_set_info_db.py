@@ -165,6 +165,13 @@ def get_from_buffer():
     return [i for i in result]
 
 
+def get_buffer_cid(cid):
+    col = db.collection('buffer')
+    result = db.find_records(col, {'cid': cid})
+    # db.delete_records(col, {})
+
+    return [i for i in result]
+
 def clear_buffer():
     col = db.collection('buffer')
     db.delete_records(col, {})

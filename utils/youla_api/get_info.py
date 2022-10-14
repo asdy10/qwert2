@@ -20,8 +20,8 @@ async def delete_ads_by_owner_async(ads, params):
         try:
             if params['active_ad_min'] <= owner_param['prods_active_cnt'] <= params['active_ad_max']\
                     and params['close_ad_min'] <= owner_param['prods_sold_cnt'] <= params['close_ad_max'] \
-                    and params['views_min'] <= owner_param['views'] <= params['views_max']:
-                   # and params['reviews'] <= owner_param['reviews']:
+                    and params['views_min'] <= owner_param['views'] <= params['views_max'] \
+                    and owner_param['reviews'] <= 3:
                 i['reviews'] = owner_param['reviews']
                 i['active_count'] = owner_param['prods_active_cnt']
                 i['phone'] = owner_param['phone']
