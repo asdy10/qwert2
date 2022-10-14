@@ -77,9 +77,7 @@ async def run_send_notice():
                         print('len ads filter', len(ads))
                         name1 = 'full'
                         print(ads[1])
-
-
-                        if len(ads) > 20:
+                        if len(ads) > 0:
                             try:
                                 res = pd.read_excel(f'{name1}.xlsx', sheet_name='Result')
                                 def_arr = res.values.tolist()
@@ -94,13 +92,15 @@ async def run_send_notice():
                                         count_new_ads += 1
                                 #print(1)
                                 for i in get_buffer_cid(user['cid']):
-                                    new_arr.append(i)
-                                    def_arr.append(
-                                        [i['link'], i['name'], i['price'], i['views'], i['seller'], i['phone'],
-                                         i['active_count'], i['sold_count'], i['reviews'], i['phone']])  #
-                                    count_new_ads += 1
+                                    if i['link'] not in str(new_arr):
+                                        new_arr.append(i)
+                                        def_arr.append(
+                                            [i['link'], i['name'], i['price'], i['views'], i['seller'], i['phone'],
+                                             i['active_count'], i['sold_count'], i['reviews'], i['phone']])  #
+                                        count_new_ads += 1
                                 print('len new ads', count_new_ads)
                                 if count_new_ads > 20:
+                                    clear_buffer_cid(user['cid'])
                                     for i in def_arr:
                                         if len(i) < 10:
                                             i += [0, '0']
