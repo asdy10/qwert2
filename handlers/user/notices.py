@@ -76,13 +76,13 @@ async def run_send_notice():
                         full_ads += ads
                         print('len ads filter', len(ads))
                         name1 = 'full'
-                        print(ads[1])
                         if len(ads) > 0:
                             try:
                                 res = pd.read_excel(f'{name1}.xlsx', sheet_name='Result')
                                 def_arr = res.values.tolist()
                                 new_arr = []
                                 count_new_ads = 0
+                                print(1)
                                 for i in full_ads:
                                     if i['seller'] not in str(def_arr):
                                         new_arr.append(i)
@@ -90,7 +90,7 @@ async def run_send_notice():
                                             [i['link'], i['name'], i['price'], i['views'], i['seller'], i['phone'],
                                              i['active_count'], i['sold_count'], i['reviews'], i['phone']]) #
                                         count_new_ads += 1
-                                #print(1)
+                                print(2)
                                 for i in get_buffer_cid(user['cid']):
                                     if i['link'] not in str(new_arr):
                                         new_arr.append(i)
@@ -171,18 +171,18 @@ async def run_send_notice():
 
                # clear_buffer()
 
-            t_sleep = round(time.time() - st_time)
-            if t_sleep <= 0:
-                t_sleep = 0
-            #await send_messages()
-            print('sleep send notice', 60 - t_sleep)
-            await asyncio.sleep(60 - t_sleep)
+            # t_sleep = round(20 - (time.time() - st_time))
+            # if t_sleep <= 0:
+            #     t_sleep = 0
+            # #await send_messages()
+            # print('sleep send notice', t_sleep)
+            await asyncio.sleep(10)
         except Exception as e:
             print(e)
 
 
 async def send_messages():
-    await asyncio.sleep(10)
+    await asyncio.sleep(5)
     while True:
         try:
             print('start send messages')
@@ -194,11 +194,11 @@ async def send_messages():
                 await bot.send_message(i['cid'], i['message'].split(';')[0])
                 await bot.send_document(i['cid'], open(i['message'].split(';')[1], 'rb'))
                 delete_message(i['cid'], i['message'])
-            t_sleep = round(time.time() - st_time)
-            if t_sleep <= 0:
-                t_sleep = 0
-            print('sleep send message', 60 - t_sleep)
-            await asyncio.sleep(60 - t_sleep)
+            # t_sleep = round(time.time() - st_time)
+            # if t_sleep <= 0:
+            #     t_sleep = 0
+            # print('sleep send message', 60 - t_sleep)
+            await asyncio.sleep(5)
             for i in rem:
                 os.remove(i)
         except Exception as e:
