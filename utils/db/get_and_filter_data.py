@@ -2,7 +2,7 @@ import asyncio
 import time
 from itertools import groupby
 
-from utils.db.get_set_info_db import get_table, get_from_buffer
+from utils.db.get_set_info_db import get_table, get_from_buffer, db_get_sended, db_add_sended
 from utils.youla_api.get_info import delete_ads_by_owner_async, get_phones_async
 
 
@@ -34,13 +34,23 @@ async def get_and_filter_all(params, new_arr_links, def_arr):
         params['category'] = i
         ads += get_table(params)
     ads2 = []
-    ads_idx = []
+    ads_idx = db_get_sended()
     print('get all from db', len(ads), time.time() - st_full_time)
     mid_time = time.time()
+    # with open('wtf.txt', 'w') as f:
+    #     for i in ads:
+    #         try:
+    #             f.write(str(i) + '\n')
+    #         except:
+    #             pass
+    new_idx = []
     for i in ads:
         if i['seller'] not in ads_idx :#and i['idx'] not in str(def_arr)
             ads2.append(i)
             ads_idx.append(i['seller'])
+            new_idx.append(i['seller'])
+    #print(ads_idx)
+
     ads = ads2.copy()
     print('filtered db', len(ads), time.time() - mid_time)
     mid_time = time.time()

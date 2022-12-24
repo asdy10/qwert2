@@ -147,4 +147,7 @@ def t(add_days):
     print('chek date', date_time)
     if date_time > datetime.today():
         print('yes')
-t(30)
+
+if __name__ == '__main__':
+    print(1634175284)
+    print(datetime.fromtimestamp(1634175284))

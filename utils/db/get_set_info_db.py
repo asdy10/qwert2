@@ -183,6 +183,18 @@ def clear_buffer():
     db.delete_records(col, {})
 
 
+def db_get_sended():
+    col = db.collection('sended')
+    result = db.find_records(col, {})
+    return [i for i in result]
+
+
+def db_add_sended(ids: list):
+    print('add sended', ids)
+    col = db.collection('sended')
+    db.insert_many_records(col, [{'idx': i} for i in ids])
+
+
 '''Telegram Bot End'''
 
 

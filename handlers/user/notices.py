@@ -61,18 +61,24 @@ async def run_send_notice():
     while True:
         try:
             st_time = time.time()
-            table = get_from_buffer()
+            #table = get_from_buffer()
 
-            if len(table) > 0:
+            if True:
                 users = get_users()
 
                 for user in users:
+                    cid = user['cid']
                     if int(user['notice']) > 0 and str(user['sub']) == '1':
 
                         temp = get_template_cid_tid(user['cid'], user['notice'])
                         full_ads = []
                         def_arr = []
                         ads = await get_and_filter_all(temp, ['full'], def_arr)
+
+                        ads_buffer = get_buffer_cid(cid)
+                        for ad in ads:
+                            if ad['idx'] not in str(ads_buffer):
+                                full_ads.append(ad)
                         full_ads += ads
                         print('len ads filter', len(ads))
                         name1 = 'full'
@@ -99,7 +105,7 @@ async def run_send_notice():
                                              i['active_count'], i['sold_count'], i['reviews'], i['phone']])  #
                                         count_new_ads += 1
                                 print('len new ads', count_new_ads)
-                                if count_new_ads > 20:
+                                if count_new_ads > 0:
                                     clear_buffer_cid(user['cid'])
                                     for i in def_arr:
                                         if len(i) < 10:
@@ -115,19 +121,33 @@ async def run_send_notice():
                                                        'Sold count': [i[7] for i in def_arr],
                                                        'Reviews': [i[8] for i in def_arr],
                                                        'Phone': [i[9] for i in def_arr],})
-                                    #print(2)
-                                    df2 = pd.DataFrame({'Link': [i['link'] for i in new_arr],
-                                                        'Name': [i['name'] for i in new_arr],
-                                                        'Price': [i['price'] for i in new_arr],
-                                                        'Views': [i['views'] for i in new_arr],
-                                                        'Seller': [i['seller'] for i in new_arr],
-                                                        #'Phone': [i['phone'] for i in new_arr],
-                                                        'Active count': [i['active_count'] for i in new_arr],
-                                                        'Sold count': [i['sold_count'] for i in new_arr],
-                                                        'Reviews': [i['reviews'] for i in new_arr],
-                                                        'Phone': [i['phone'] for i in new_arr]
+                                    #print(2)Номер	Заголовок	Цена	Ссылка	Дата публикации	Кол-во просмотров	Кол-во в избранном	Дата регистрации продавца	Рейтинг продавца	Активных	Продано	Ссылка на продавца
+                                    df2 = pd.DataFrame({'Номер': [i for i in range(len(new_arr))],
+                                                        'Заголовок': [i['name'] for i in new_arr],
+                                                        'Цена': [i['price'] for i in new_arr],
+                                                        'Ссылка': [i['link'] for i in new_arr],
+                                                        'Дата публикации': [str(datetime.fromtimestamp(i['pub_date'])) for i in new_arr],
+                                                        'Кол-во просмотров': [i['views'] for i in new_arr],
+                                                        'Кол-во в избранном': [0 for i in new_arr],
+                                                        'Дата регистрации продавца': [0 for i in new_arr],
+                                                        'Рейтинг продавца': [0 for i in new_arr],
+                                                        'Активных': [i['active_count'] for i in new_arr],
+                                                        'Продано': [i['sold_count'] for i in new_arr],
+                                                        'Ссылка на продавца': [f'https://youla.ru/user/{i["seller"]}/active' for i in new_arr],
                                                         })
+                                    # df2 = pd.DataFrame({'Link': [i['link'] for i in new_arr],
+                                    #                     'Name': [i['name'] for i in new_arr],
+                                    #                     'Price': [i['price'] for i in new_arr],
+                                    #                     'Views': [i['views'] for i in new_arr],
+                                    #                     'Seller': [i['seller'] for i in new_arr],
+                                    #                     #'Phone': [i['phone'] for i in new_arr],
+                                    #                     'Active count': [i['active_count'] for i in new_arr],
+                                    #                     'Sold count': [i['sold_count'] for i in new_arr],
+                                    #                     'Reviews': [i['reviews'] for i in new_arr],
+                                    #                     'Phone': [i['phone'] for i in new_arr]
+                                    #                     })
                                     #print(3)
+                                    db_add_sended([i['seller'] for i in new_arr])
                                     df.to_excel(f'{name1}.xlsx', sheet_name='Result', index=False)
                                     name_to_send = f'{name1}{round(time.time())}'
                                     df2.to_excel(f'{name_to_send}.xlsx', sheet_name='Result', index=False)
@@ -143,10 +163,14 @@ async def run_send_notice():
                                 else:
                                     print('not enough ads')
                                     col = db.collection('buffer')
+                                    append_buffer_ads = []
                                     for ad in ads:
                                         ad.pop('_id')
+                                        #print(ad)
                                         ad['cid'] = user['cid']
-                                    db.insert_many_records(col, ads)
+                                        #print(ad)
+                                        append_buffer_ads.append(ad)
+                                    db.insert_many_records(col, append_buffer_ads)
                             except Exception as e:
                                 print(e)
                                 df = pd.DataFrame({'Link': [i['link'] for i in full_ads],
@@ -158,7 +182,7 @@ async def run_send_notice():
                                                    'Active count': [i['active_count'] for i in full_ads],
                                                    'Sold count': [i['sold_count'] for i in full_ads]})
                                 df.to_excel(f'{name1}.xlsx', sheet_name='Result', index=False)
-                                s = f'Уведомление. Найдено: {len(full_ads)} объявлений, время сбора: {round(time.time() - st_time, 2)} секунд'
+                                s = f'Уведомление. Найдено: {len(full_ads)} объявлений'#, время сбора: {round(time.time() - st_time, 2)} секунд
                                 name1 = f'{name1}.xlsx'
                                 create_message(user['cid'], f'{s};{name1}')
                                 # print(4)
@@ -199,7 +223,7 @@ async def send_messages():
             #     t_sleep = 0
             # print('sleep send message', 60 - t_sleep)
             await asyncio.sleep(5)
-            for i in rem:
-                os.remove(i)
+            # for i in rem:
+            #     os.remove(i)
         except Exception as e:
             print(e)
